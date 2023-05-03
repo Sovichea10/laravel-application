@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: laravel-app
+    build: 
+      context: ./laravel10./
+      dockerfile: Dockerfile
+    volumes:
+      - ./laravel10:/var/www
+    ports:
+      - 7000:8000
