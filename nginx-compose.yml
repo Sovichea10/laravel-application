@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  nginx:
+      container_name: nginx
+      image: nginx:alpine
+      ports:
+        - "8080:80"
+        - "8081:100"
+      # command: ["sleep", "infinity"]
+      volumes:
+        - ./nginx/conf.d:/etc/nginx/conf.d
+        - ./login-and-registration/public:/var/www/laravel10/public
+        - ../../MPWT/OSSP/web-admin/public:/var/www/ossp-portal/public
+      networks:
+        # - nginx
+        - laravel10_api
+networks:
+  laravel10_api:
+    external: true

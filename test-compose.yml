@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  test-app:
+    image: ubuntu
+    volumes:
+      - /etc/hostname:/etc/hostname
+    hostname: ${NAME}
+    restart: on-failure
+    command: [ "sleep", "infinity" ]

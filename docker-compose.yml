@@ -1,12 +1,65 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  api:
-    container_name: laravel-app
-    build: 
-      context: ./laravel10./
-      dockerfile: Dockerfile
-    volumes:
-      - ./laravel10:/var/www
+  # oracle-db:
+  #   image: container-registry.oracle.com/database/enterprise:latest
+  #   container_name: oracle-db
+  #   environment:
+  #       ORACLE_SID: ORCLCDB
+  #       # Service Name
+  #       ORACLE_PDB: ORCLPDB1 
+  #       # ORACLE_USER: sovichea
+  #       # ORACLE_PWD: Abc123kh
+  #   ports:
+  #     - "1521:1521"
+  #     - "5500:5500"
+  #   volumes:
+  #     - oracle-data:/opt/oracle/oradata
+  #     - oracle-backup:/opt/oracle/backup
+  #   healthcheck:
+  #     test: ["CMD", "sqlplus", "-L", "sys/Oracle_123@//localhost:1521/ORCLCDB as sysdba", "@healthcheck.sql"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   networks:
+  #     - api
+# ==================================================================>> API
+  app:
+    image: laravel10
+    container_name: laravel10-api
+    hostname: laravel
+    # build:
+    #   context: ./login-and-registration/.
+    #   dockerfile: Dockerfile
+    # restart: on-failure
+    # command: ["sleep","infinity"]
     ports:
-      - 7000:8000
+      - "8000:8000"
+    # volumes:
+    #   - ./login-and-registration/app:/var/www/laravel10/app
+    #   - ./login-and-registration/bootstrap:/var/www/laravel10/bootstrap
+    #   - ./login-and-registration/config:/var/www/laravel10/config
+    #   - ./login-and-registration/public:/var/www/laravel10/public
+    #   - ./login-and-registration/resources:/var/www/laravel10/resources
+    #   - ./login-and-registration/routes:/var/www/laravel10/routes
+    # command: php artisan --host=0.0.0.0 serve
+    # environment:
+      # =======================>> Oracle DB
+      # DB_CONNECTION: oracle
+      # DB_TNS: ORCLPDB1
+      # DB_HOST: oracle-db
+      # DB_PORT: 1521
+      # DB_DATABASE: sovichea
+      # DB_USERNAME: sovichea
+      # DB_PASSWORD: Abc123kh
+      # =======================>> Database mysql
+    networks:
+      - api
+
+# volumes:
+#   oracle-data:
+#   oracle-backup:
+
+networks:
+  api:
+    driver: bridge
