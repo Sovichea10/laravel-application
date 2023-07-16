@@ -1,65 +1,130 @@
 version: '3.8'
 
 services:
-  # oracle-db:
-  #   image: container-registry.oracle.com/database/enterprise:latest
-  #   container_name: oracle-db
-  #   environment:
-  #       ORACLE_SID: ORCLCDB
-  #       # Service Name
-  #       ORACLE_PDB: ORCLPDB1 
-  #       # ORACLE_USER: sovichea
-  #       # ORACLE_PWD: Abc123kh
-  #   ports:
-  #     - "1521:1521"
-  #     - "5500:5500"
+#====================================================> DummyBank API
+  api:
+    image: bank-api:v${TAG}
+    container_name: dummybank-api
+    restart: unless-stopped
+    tty: true
+    build:
+      context: ./api-v1/.
+      dockerfile: Dockerfile
+    volumes:
+        - ./api-v1/app:/var/www/app
+        - ./api-v1/config:/var/www/config
+        - ./api-v1/resources:/var/www/resources
+        - ./api-v1/routes:/var/www/routes
+        - ./api-v1/storage:/var/www/storage
+        - ./api-v1/public:/var/www/public
+    ports:
+          - "3002:8000"
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: dummy_bank
+      DB_USERNAME: root
+      DB_PASSWORD: pwd
+      #Payment MPWT
+      MPWT_PAYMENT_HOST: dev.mpwt.gov.kh:25803 
+      MPWT_PAYMENT_USERNAME: DUMMYBANK
+      MPWT_PAYMENT_KEY: RFVNTVlCQU5LOlBFNmM3ZVBaNndGSA==
+      #Plasegate
+      TOKEN_PLASGATE: 9d2_NvJBXvqimPInql-NyiEK-Buqub
+      SENDER_ID: MPWT
+      BASEURL: api.plasgate.com/send
+      #TelegramBot
+      TELEGRAM_BOT_TOKEN: 5321600070:AAFKMyafNgpewch5raKkjw-uDa1CcCH5NaY
+      OTP_CHANNEL_CHAT_ID: -1001405573950
+      PAYMENT_CHANNEL_CHAT_ID: -1001607196389
+    networks:
+      - dummy_bank
+# =================================================================>> CACHE REDIS
+  # cache:
+  #   image: redis:6.2-alpine
+  #   container_name: redis-cache
   #   volumes:
-  #     - oracle-data:/opt/oracle/oradata
-  #     - oracle-backup:/opt/oracle/backup
-  #   healthcheck:
-  #     test: ["CMD", "sqlplus", "-L", "sys/Oracle_123@//localhost:1521/ORCLCDB as sysdba", "@healthcheck.sql"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
+  #     - ./cache:/data
   #   networks:
-  #     - api
+  #     - cache
+# =================================================================>> ORACLE DB
+  oracle-db:
+    image: container-registry.oracle.com/database/enterprise:latest
+    container_name: oracle-db
+    environment:
+        ORACLE_SID: ORCLCDB
+        # Service Name
+        ORACLE_PDB: ORCLPDB1 
+        # ORACLE_USER: sovichea
+        # ORACLE_PWD: Abc123kh
+    ports:
+      - "1521:1521"
+    volumes:
+      - ./oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "sys/Oracle_123@//localhost:1521/ORCLCDB as sysdba", "@healthcheck.sql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - api
 # ==================================================================>> API
   app:
-    image: laravel10
+    image: laravel10_app:latest
     container_name: laravel10-api
     hostname: laravel
     # build:
     #   context: ./login-and-registration/.
     #   dockerfile: Dockerfile
     # restart: on-failure
-    # command: ["sleep","infinity"]
+    # command: ["sleep","infinity"]"
+    volumes:
+      - ./login-and-registration/app:/var/www/laravel10/app
+      - ./login-and-registration/bootstrap:/var/www/laravel10/bootstrap
+      - ./login-and-registration/config:/var/www/laravel10/config
+      - ./login-and-registration/public:/var/www/laravel10/public
+      - ./login-and-registration/resources:/var/www/laravel10/resources
+      - ./login-and-registration/routes:/var/www/laravel10/routes
+      - ./login-and-registration/storage:/var/www/laravel10/storage
+      - ./login-and-registration/tests:/var/www/laravel10/tests
     ports:
       - "8000:8000"
-    # volumes:
-    #   - ./login-and-registration/app:/var/www/laravel10/app
-    #   - ./login-and-registration/bootstrap:/var/www/laravel10/bootstrap
-    #   - ./login-and-registration/config:/var/www/laravel10/config
-    #   - ./login-and-registration/public:/var/www/laravel10/public
-    #   - ./login-and-registration/resources:/var/www/laravel10/resources
-    #   - ./login-and-registration/routes:/var/www/laravel10/routes
-    # command: php artisan --host=0.0.0.0 serve
     # environment:
-      # =======================>> Oracle DB
-      # DB_CONNECTION: oracle
-      # DB_TNS: ORCLPDB1
-      # DB_HOST: oracle-db
-      # DB_PORT: 1521
-      # DB_DATABASE: sovichea
-      # DB_USERNAME: sovichea
-      # DB_PASSWORD: Abc123kh
-      # =======================>> Database mysql
+    #   # =======================>> Oracle DB
+    #   DB_CONNECTION: oracle
+    #   DB_TNS: ORCLPDB1
+    #   DB_HOST: oracle-db
+    #   DB_PORT: 1521
+    #   DB_DATABASE: sovichea
+    #   DB_USERNAME: sovichea
+    #   DB_PASSWORD: Abc123kh
+    #   # =======================>> Database mysql
+      # DB_CONNECTION: mysql
+      # DB_HOST: 172.19.24.24
+      # DB_PORT: 1001
+      # DB_DATABASE: dummy_bank
+      # DB_USERNAME: root
+      # DB_PASSWORD: bank@1234
     networks:
       - api
-
 # volumes:
 #   oracle-data:
 #   oracle-backup:
-
+#==================================================================>> NGINX
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-laravel
+    volumes:
+      - ./nginx/conf.d/laravel-app.conf:/etc/nginx/conf.d/laravel-app.conf
+      - ./nginx/conf.d/nginx.conf:/etc/nginx/nginx.conf
+      - ./login-and-registration/public:/var/www/laravel10/public
+    ports:
+      - "8080:81"
+    networks:
+      - php-8.2
 networks:
+  php-8.2:
   api:
     driver: bridge
+

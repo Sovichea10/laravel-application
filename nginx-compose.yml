@@ -2,18 +2,23 @@ version: '3.8'
 services:
   nginx:
       container_name: nginx
-      image: nginx:alpine
+      image: nginx:1.15.8-alpine
       ports:
         - "8080:80"
-        - "8081:100"
-      # command: ["sleep", "infinity"]
       volumes:
         - ./nginx/conf.d:/etc/nginx/conf.d
-        - ./login-and-registration/public:/var/www/laravel10/public
-        - ../../MPWT/OSSP/web-admin/public:/var/www/ossp-portal/public
+      #   # Laravel 10
+      #   - ./login-and-registration/public:/var/www/laravel10/public
+      #   # OSP Portal
+      #   - ../../MPWT/OSSP/web-admin/public:/var/www/ossp-portal/public
+      #   # OSP Bank API
+      #   - ../../MPWT/OSSP/ossp-api-v2/public:/var/www/ossp-api-v2/public
+      # OSR API NEW VERSION
+        - ../../MPWT/OSSR/osr-new-api-version/public:/var/www/osr-new-api-version/public
+      # Error Page
+        - ./error.html:/usr/share/nginx/html/error.html
       networks:
-        # - nginx
-        - laravel10_api
+        - ossr_api 
 networks:
-  laravel10_api:
+  ossr_api:
     external: true

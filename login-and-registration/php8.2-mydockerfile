@@ -1,8 +1,6 @@
-# ================================>>Please use my image<<======================================]
-# Set version
-ARG APP_VERSION=8.1-fpm
+ARG version=8.2-fpm-alpine
 
-FROM sovichea10/laravel-app-php:${APP_VERSION}
+FROM sovichea10/php-oci-mysql:${version}
 
 # Copy directory
 COPY . /var/www/laravel10
@@ -20,7 +18,4 @@ RUN php artisan key:generate
 RUN chown -R www-data:www-data /var/www
 RUN chmod -R 755 /var/www/laravel10/storage
 
-EXPOSE 9000
-
 CMD ["php-fpm"]
-

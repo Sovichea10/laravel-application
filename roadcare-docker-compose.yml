@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+#===========================>> API
+  # api:
+  #     container_name: roadcare-api
+  #     build:
+  #         context: ./api/.
+  #         dockerfile: Dockerfile
+  #     volumes:
+  #         - ./api/app:/var/www/app
+  #         - ./api/resources:/var/www/resources
+  #         - ./api/routes:/var/www/routes
+  #         - ./api/database:/var/www/database
+  #         - ./api/storage:/var/www/storage
+  #         - ./api/config:/var/www/config
+  #         - ./api/public:/var/www/public
+  #         - ./api/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+  #     ports:
+  #         - "7002:8000"
+  #     environment:
+  #         DB_CONNECTION: mysql
+  #         DB_HOST: 172.19.16.6
+  #         DB_PORT: 3308
+  #         DB_DATABASE: ROADCARE_SUPERVISION
+  #         DB_USERNAME: m_roadcare_sup
+  #         DB_PASSWORD: M_r0ad5upZ3J@n
+  #     networks:
+  #         - roadcare
+
+#===========================>> Cache
+  cache:
+    image: redis:6.2-alpine
+    container_name: redis-cache
+    # default port 6379
+    volumes:
+      - ./cache:/data
+    networks:
+      - roadcare
+networks:
+  roadcare:
+    driver: bridge

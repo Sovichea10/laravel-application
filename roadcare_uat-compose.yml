@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+
+  api:
+      container_name: roadcare-api-uat
+      build:
+          context: ./api/.
+          dockerfile: Dockerfile
+      volumes:
+          - ./api/app:/var/www/app
+          - ./api/resources:/var/www/resources
+          - ./api/routes:/var/www/routes
+          - ./api/database:/var/www/database
+          - ./api/storage:/var/www/storage
+          - ./api/config:/var/www/config
+      # command: php artisan --host=0.0.0.0 serve
+      ports:
+          - "3010:8000"
+      environment:
+          # DEV DB
+          #  DB_CONNECTION: mysql
+          #  DB_HOST: 172.19.16.6
+          #  DB_PORT: 3308
+          #  DB_DATABASE: ROADCARE_SUPERVISION
+          #  DB_USERNAME: m_roadcare_sup
+          #  DB_PASSWORD: M_r0ad5upZ3J@n
+
+          # UAT DB
+          DB_CONNECTION: mysql
+          DB_HOST: 172.19.16.6
+          DB_PORT: 3308
+          DB_DATABASE: ROADCARE_UAT
+          DB_USERNAME: roadcare_uat
+          DB_PASSWORD: R0adcR3_UaT
+      networks:
+          - vr_vr
+networks:
+  vr_vr:

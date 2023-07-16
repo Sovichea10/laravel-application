@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+# ==================================================================>> API
+  app:
+    container_name: laravel5-app
+    hostname: laravel5
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/var/www/html/app
+      - ./bootstrap:/var/www/html/bootstrap
+      - ./config:/var/www/html/config
+      - ./public:/var/www/html/public
+      - ./resources:/var/www/html/resources
+      - ./routes:/var/www/html/routes
+      - ./storage:/var/www/html/storage
+    environment:
+      DB_CONNECTION: '' 
+      DB_TNS: '' 
+      DB_HOST: ''
+      DB_PORT: '' 
+      DB_DATABASE: '' 
+      DB_USERNAME: '' 
+      DB_PASSWORD: '' 
+    networks:
+      - app 
+networks:
+  driver: bridge

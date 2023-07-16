@@ -2,7 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TestController;
+
+/** @var Illuminate\Support\Facades\Route $router */;
 
 
 /*
@@ -19,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+$router->get('/test', [TestController::class, 'index']);
 
 Route::get('/host', function() {
     $host= env('DB_HOST');

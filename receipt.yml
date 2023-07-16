@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  receipt:
+      container_name: receipt
+      build: 
+        context: ./receipt/ 
+        dockerfile: Dockerfile
+      ports:
+        - "8081:80"
+      volumes:
+        - ./receipt:/usr/share/nginx/html
+        - ./receipt:/etc/nginx/conf.d
+      networks:
+        - receipt 
+networks:
+  receipt:
+    driver: bridge
